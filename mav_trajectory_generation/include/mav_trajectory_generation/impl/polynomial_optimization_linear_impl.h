@@ -99,6 +99,39 @@ bool PolynomialOptimization<_N>::setupFromVertices(
 }
 
 template <int _N>
+bool PolynomialOptimization<_N>::setupFromWaypoints(
+    const Eigen::MatrixXd &waypoints, int derivToMin) {
+  // Setup vertices from waypoints
+  Vertex::Vector vertices;
+  // First
+  Vertex start(dimension_);
+  start.makeStartOrEnd(waypoints.col(0), derivToMin);
+  vertices.push_back(start);
+  // Intermediate waypoints
+  for (int i=1; i<waypoints.cols() - 1; ++i) {
+    Vertex intermediate(dimension_);
+    intermediate.addConstraint(derivative_order::POSITION,
+                               waypoints.col(i));
+    vertices.push_back(intermediate);
+  }
+  // Last
+  Vertex end(dimension_);
+  end.makeStartOrEnd(waypoints.col(waypoints.cols() - 1), derivToMin);
+  vertices.push_back(end);
+
+  // Estimate segment times - Numerical values taken from the example here:
+  // https://github.com/ethz-asl/mav_trajectory_generation/blob/master/README.md
+  std::vector<double> segment_times;
+  const double v_max = 2.0;
+  const double a_max = 2.0;
+  const double magic_fabian_constant = 0; // A tuning parameter. 0 works better than 6.5
+
+  segment_times = estimateSegmentTimes(vertices, v_max, a_max, magic_fabian_constant);
+
+  return setupFromVertices(vertices, segment_times, derivToMin);
+}
+
+template <int _N>
 void PolynomialOptimization<_N>::setupMappingMatrix(double segment_time,
                                                     SquareMatrix* A) {
   // The sum of fixed/free variables has to be equal on both ends of the

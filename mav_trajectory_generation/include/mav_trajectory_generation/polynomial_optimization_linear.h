@@ -79,6 +79,11 @@ class PolynomialOptimization {
   bool setupFromPositons(const std::vector<double>& positions,
                          const std::vector<double>& times);
 
+  // Sets up the optimization problem from waypoints using default values.
+  // The waypoints are converted into vertices first and then setupFromVertices()
+  // is called.
+  bool setupFromWaypoints(const Eigen::MatrixXd &waypoints, int derivToMin);
+
   // Wrapper that inverts the mapping matrix (A in [1]) to take advantage
   // of its structure.
   // Input: A matrix
