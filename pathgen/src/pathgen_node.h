@@ -13,7 +13,6 @@ private:
   bool buildTrajectory(const Eigen::MatrixXd &waypoints, int derivToMin);
   void setCurrentTime(double time);
   void setPlaySpeed(float speed);
-  double dt();
   void advanceTime(float speed);
   Eigen::VectorXd getPosition(float time);
   void publishPose();

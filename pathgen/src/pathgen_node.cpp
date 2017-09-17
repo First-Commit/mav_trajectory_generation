@@ -53,11 +53,9 @@ void PathGen::advanceTime(float speed) {
   if (speed == 0) {
     setCurrentTime(current_time_);
   } else {
-    setCurrentTime(current_time_ + (dt() * speed));
+    setCurrentTime(current_time_ + ((1/hz_) * speed));
   }
 }
-
-double PathGen::dt() { return (1 / hz_); }
 
 void PathGen::setPlaySpeed(float speed) {
   speed_ = speed;
