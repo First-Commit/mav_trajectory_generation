@@ -14,7 +14,6 @@
 
   <depend>roscpp</depend>
   <depend>eigen_catkin</depend>
-  <depend>mav_msgs</depend>
   <depend>mav_trajectory_generation</depend>
   <depend>eigen_checks</depend>
   <depend>geometry_msgs</depend>
