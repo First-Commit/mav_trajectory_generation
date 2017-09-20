@@ -111,6 +111,7 @@ bool PathGen::addWaypointFront(const Eigen::Vector4d &current_pose, Eigen::Matri
 }
 
 void PathGen::publishPose() {
+  if(!path_loaded_) return;
   auto pose = getPosition(current_time_);
   geometry_msgs::Twist msg;
   msg.linear.x = pose.x();
@@ -130,11 +131,13 @@ void PathGen::publishStatus() {
   msg.playspeed = speed_;
   msg.pathloaded = path_loaded_;
   status_pub_.publish(msg);
-  ROS_DEBUG("Status | cur: %0.3f, end: %0.3f, play: %0.1f, loaded: %d", current_time_, end_time_,
+  ROS_INFO("Status | cur: %0.3f, end: %0.3f, play: %0.1f, loaded: %d", current_time_, end_time_,
             speed_, path_loaded_);
 }
 
-Eigen::VectorXd PathGen::getPosition(float time) { return traj_->evaluate(time); }
+Eigen::VectorXd PathGen::getPosition(float time) { 
+  return traj_->evaluate(time); 
+}
 
 void PathGen::advanceTime(float speed) {
   if (speed == 0) {
