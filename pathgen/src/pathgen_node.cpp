@@ -4,7 +4,7 @@ PathGen::PathGen()
     : pose_pub_(n_.advertise<geometry_msgs::Twist>("/fc/cmd/pose", 10)),
       status_pub_(n_.advertise<pathgen::PathGenStatus>("/fc/path/status", 10)),
       play_sub_(n_.subscribe("/fc/path/play", 10, &PathGen::onPlay, this)),
-      pose_sub_(n_.subscribe("pose", 10, &PathGen::onPose, this)), // from snav
+      pose_sub_(n_.subscribe("/pose", 10, &PathGen::onPose, this)), // from snav
       build_traj_service_(n_.advertiseService("/fc/path/build", &PathGen::onBuild, this)),
       speed_(0.0),
       current_time_(0.0),
@@ -18,10 +18,12 @@ PathGen::PathGen()
   // pre-load waypoints
   // TODO(pickledgator): do this via yaml file
   waypoints_ = Eigen::MatrixXd(4, 5);
-  waypoints_ << 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+  waypoints_ << 0, 1, 1, 0, 0, 
+                0, 0, 1, 1, 0, 
+                1, 1, 1, 1, 1, 
+                0, 0, 0, 0, 0;
 
   while (ros::ok()) {
-    speed_ = 0.5;
     advanceTime(speed_);
     publishPose();
     if(cnt_ % 10 == 0) {
