@@ -47,5 +47,6 @@ class PathGen {
 
   bool path_loaded_;
   bool first_play_;
+  unsigned int cnt_;
 
 };

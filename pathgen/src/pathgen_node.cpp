@@ -11,7 +11,8 @@ PathGen::PathGen()
       hz_(10),
       first_play_(false),
       path_loaded_(false),
-      current_pose_(Eigen::Vector4d(0.0, 0.0, 0.0, 0.0)) {
+      current_pose_(Eigen::Vector4d(0.0, 0.0, 0.0, 0.0)),
+      cnt_(0) {
   ros::Rate loop_rate(hz_);
 
   // pre-load waypoints
@@ -23,11 +24,14 @@ PathGen::PathGen()
     speed_ = 0.5;
     advanceTime(speed_);
     publishPose();
-    publishStatus();
-
+    if(cnt_ % 10 == 0) {
+      publishStatus();
+      cnt_ = 1;
+    }
     ros::spinOnce();
 
     loop_rate.sleep();
+    cnt_++;
   }
 }
 
