@@ -17,11 +17,11 @@ PathGen::PathGen()
 
   // pre-load waypoints
   // TODO(pickledgator): do this via yaml file
-  waypoints_ = Eigen::MatrixXd(4, 5);
-  waypoints_ << 0, 1, 1, 0, 0, 
-                0, 0, 1, 1, 0, 
-                1, 1, 1, 1, 1, 
-                0, 0, 0, 0, 0;
+  waypoints_ = Eigen::MatrixXd(4, 4);
+  waypoints_ << 3.0,  0,    3.0,  0,
+                0,    0,    0,    0,
+                1.4,  1.4,  1.4,  1.4,
+                0,    0,    0,    0.;
 
   while (ros::ok()) {
     advanceTime(speed_);
@@ -141,7 +141,10 @@ void PathGen::publishStatus() {
             speed_, path_loaded_);
 }
 
-Eigen::VectorXd PathGen::getPosition(float time) { 
+Eigen::VectorXd PathGen::getPosition(double time) {
+  if(time > end_time_) {
+    time = end_time_;
+  }
   return traj_->evaluate(time); 
 }
 

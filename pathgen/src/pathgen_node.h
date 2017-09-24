@@ -15,10 +15,10 @@ class PathGen {
 
  private:
   bool buildTrajectory(int derivToMin);
-  void setCurrentTime(double tisme);
+  void setCurrentTime(double time);
   void setPlaySpeed(float speed);
   void advanceTime(float speed);
-  Eigen::VectorXd getPosition(float time);
+  Eigen::VectorXd getPosition(double time);
   void publishPose();
   void publishStatus();
   void onPlay(const std_msgs::Float64::ConstPtr& msg);
@@ -37,10 +37,10 @@ class PathGen {
 
   std::shared_ptr<mav_trajectory_generation::Trajectory> traj_;
   float speed_;
-  float current_time_;
-  float hz_;
-  float start_time_;
-  float end_time_;
+  double current_time_;
+  double hz_;
+  double start_time_;
+  double end_time_;
 
   Eigen::Vector4d current_pose_;
   Eigen::MatrixXd waypoints_;
