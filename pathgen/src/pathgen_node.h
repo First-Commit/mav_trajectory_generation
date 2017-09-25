@@ -9,10 +9,12 @@
 #include "pathgen/PathGenStatus.h"
 #include <tf/transform_datatypes.h>
 #include "csv.h"
+#include <iostream>
+#include <fstream>
 
 class PathGen {
  public:
-  PathGen();
+  PathGen(const std::string &path_file, const std::string &out_file);
 
  private:
   bool buildTrajectory(int derivToMin);
@@ -31,6 +33,7 @@ class PathGen {
 
   void loadPathData(const std::string &path_file, Eigen::MatrixXd &waypoints);
   void printPathData(const Eigen::MatrixXd &waypoints);
+  void saveTrajectory(const std::string &out_file);
 
   ros::NodeHandle n_;
   ros::Publisher pose_pub_;

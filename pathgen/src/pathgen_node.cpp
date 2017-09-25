@@ -1,6 +1,6 @@
 #include "pathgen_node.h"
 
-PathGen::PathGen()
+PathGen::PathGen(const std::string &path_file, const std::string &out_file)
     : pose_pub_(n_.advertise<geometry_msgs::Twist>("/fc/cmd/pose", 10)),
       status_pub_(n_.advertise<pathgen::PathGenStatus>("/fc/path/status", 10)),
       play_sub_(n_.subscribe("/fc/path/play", 10, &PathGen::onPlay, this)),
@@ -16,14 +16,12 @@ PathGen::PathGen()
   ros::Rate loop_rate(hz_);
 
   // pre-load waypoints
-  // TODO(pickledgator): do this via yaml file
-  waypoints_ = Eigen::MatrixXd(4, 5);
-  waypoints_ << 0, 1, 1, 0, 0, 
-                0, 0, 1, 1, 0, 
-                1, 1, 1, 1, 1, 
-                0, 0, 0, 0, 0;
-  // loadPathData("path_out.csv", waypoints_);
+  loadPathData(path_file, waypoints_);
   printPathData(waypoints_);
+  if(!out_file.empty()) {
+    saveTrajectory(out_file);
+    return;
+  }
 
   while (ros::ok()) {
     advanceTime(speed_);
@@ -39,10 +37,27 @@ PathGen::PathGen()
   }
 }
 
+void PathGen::saveTrajectory(const std::string &out_file) {
+  auto res_traj = buildTrajectory(/*derivToMin=*/1);
+  ROS_INFO("Writing trajectory to %s", out_file.c_str());
+  Eigen::VectorXd intervals = Eigen::VectorXd::LinSpaced(500, 0, traj_->getMaxTime());
+  std::ofstream myfile;
+  myfile.open(out_file);
+  myfile << "x,y,z,yaw" << "\n";
+  for (int i = 0; i < intervals.size(); i++) {
+    if(intervals[i] < traj_->getMaxTime()) {
+      auto pose = getPosition(intervals[i]);
+      ROS_INFO("Writing %0.3f %0.3f %0.3f %0.3f\n", pose[0], pose[1], pose[2], pose[3]);
+      myfile << pose[0] << "," << pose[1] << "," << pose[2] << "," << pose[3] << "\n";
+    }
+  }
+  myfile.close();
+  ROS_INFO("Done, wrote %d points", (int)(intervals.size()));
+}
+
 void PathGen::loadPathData(const std::string &path_file, Eigen::MatrixXd &waypoints) {
   std::vector<Eigen::Vector4d> path;
-  io::CSVReader<4
-  > in(path_file);
+  io::CSVReader<4> in(path_file);
   in.read_header(io::ignore_extra_column, "x", "y", "z", "yaw");
   float x,y,z,yaw;
   while(in.read_row(x, y, z, yaw)){
@@ -57,7 +72,7 @@ void PathGen::loadPathData(const std::string &path_file, Eigen::MatrixXd &waypoi
 void PathGen::printPathData(const Eigen::MatrixXd &waypoints) {
   ROS_INFO("Path waypoints, count: %d", (int)(waypoints.cols()));
   for(int i=0; i<waypoints.cols(); i++) {
-    ROS_INFO("pt: %d | x %0.3f y %0.3f z %0.3f yaw %0.3f\n", i, 
+    ROS_INFO("pt: %d | x %0.3f y %0.3f z %0.3f yaw %0.3f", i, 
             waypoints(0,i), waypoints(1,i), waypoints(2,i), waypoints(3,i));
   }
 }
