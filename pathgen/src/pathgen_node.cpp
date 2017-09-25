@@ -181,7 +181,10 @@ void PathGen::publishStatus() {
             speed_, path_loaded_);
 }
 
-Eigen::VectorXd PathGen::getPosition(float time) { 
+Eigen::VectorXd PathGen::getPosition(double time) {
+  if(time > end_time_) {
+    time = end_time_;
+  }
   return traj_->evaluate(time); 
 }
 
