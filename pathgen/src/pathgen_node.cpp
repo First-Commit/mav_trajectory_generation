@@ -60,12 +60,17 @@ void PathGen::loadPathData(const std::string &path_file, Eigen::MatrixXd &waypoi
   io::CSVReader<4> in(path_file);
   in.read_header(io::ignore_extra_column, "x", "y", "z", "yaw");
   float x,y,z,yaw;
-  while(in.read_row(x, y, z, yaw)){
-    path.push_back(Eigen::Vector4d(x,y,z,yaw));
+  try {
+    while(in.read_row(x, y, z, yaw)){
+      path.push_back(Eigen::Vector4d(x,y,z,yaw));
+    }
+    waypoints = Eigen::MatrixXd(4, path.size());
+    for(int i=0; i<path.size(); i++) {
+      waypoints.col(i) = path[i];
+    }
   }
-  waypoints = Eigen::MatrixXd(4, path.size());
-  for(int i=0; i<path.size(); i++) {
-    waypoints.col(i) = path[i];
+  catch(const std::exception &e) {
+    ROS_WARN("Caught exception reading csv, %s", e.what());
   }
 }
 
