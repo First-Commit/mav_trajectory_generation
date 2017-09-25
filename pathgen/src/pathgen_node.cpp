@@ -22,6 +22,8 @@ PathGen::PathGen()
                 0, 0, 1, 1, 0, 
                 1, 1, 1, 1, 1, 
                 0, 0, 0, 0, 0;
+  // loadPathData("path_out.csv", waypoints_);
+  printPathData(waypoints_);
 
   while (ros::ok()) {
     advanceTime(speed_);
@@ -34,6 +36,29 @@ PathGen::PathGen()
 
     loop_rate.sleep();
     cnt_++;
+  }
+}
+
+void PathGen::loadPathData(const std::string &path_file, Eigen::MatrixXd &waypoints) {
+  std::vector<Eigen::Vector4d> path;
+  io::CSVReader<4
+  > in(path_file);
+  in.read_header(io::ignore_extra_column, "x", "y", "z", "yaw");
+  float x,y,z,yaw;
+  while(in.read_row(x, y, z, yaw)){
+    path.push_back(Eigen::Vector4d(x,y,z,yaw));
+  }
+  waypoints = Eigen::MatrixXd(4, path.size());
+  for(int i=0; i<path.size(); i++) {
+    waypoints.col(i) = path[i];
+  }
+}
+
+void PathGen::printPathData(const Eigen::MatrixXd &waypoints) {
+  ROS_INFO("Path waypoints, count: %d", (int)(waypoints.cols()));
+  for(int i=0; i<waypoints.cols(); i++) {
+    ROS_INFO("pt: %d | x %0.3f y %0.3f z %0.3f yaw %0.3f\n", i, 
+            waypoints(0,i), waypoints(1,i), waypoints(2,i), waypoints(3,i));
   }
 }
 

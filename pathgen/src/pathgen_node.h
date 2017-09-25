@@ -8,6 +8,7 @@
 #include "std_srvs/Trigger.h"
 #include "pathgen/PathGenStatus.h"
 #include <tf/transform_datatypes.h>
+#include "csv.h"
 
 class PathGen {
  public:
@@ -28,6 +29,9 @@ class PathGen {
                                     Eigen::MatrixXd &waypoints);
   geometry_msgs::Vector3 quatToEuler(geometry_msgs::Quaternion &quat);
 
+  void loadPathData(const std::string &path_file, Eigen::MatrixXd &waypoints);
+  void printPathData(const Eigen::MatrixXd &waypoints);
+
   ros::NodeHandle n_;
   ros::Publisher pose_pub_;
   ros::Publisher status_pub_;
@@ -44,6 +48,7 @@ class PathGen {
 
   Eigen::Vector4d current_pose_;
   Eigen::MatrixXd waypoints_;
+  std::vector<Eigen::Vector4d> path_waypoints_;
 
   bool path_loaded_;
   bool first_play_;
