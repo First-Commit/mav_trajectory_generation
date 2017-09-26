@@ -49,7 +49,7 @@ void PathGen::saveTrajectory(const std::string &out_file) {
   for (int i = 0; i < intervals.size(); i++) {
     if(intervals[i] < traj_->getMaxTime()) {
       auto pose = getPosition(intervals[i]);
-      ROS_INFO("Writing %0.3f %0.3f %0.3f %0.3f\n", pose[0], pose[1], pose[2], pose[3]);
+      ROS_INFO("Writing %0.2f %0.3f %0.3f %0.3f %0.3f", intervals[i], pose[0], pose[1], pose[2], pose[3]);
       myfile << pose[0] << "," << pose[1] << "," << pose[2] << "," << pose[3] << "\n";
     }
   }
