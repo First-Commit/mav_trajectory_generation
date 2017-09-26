@@ -8,7 +8,7 @@ PathGen::PathGen(const std::string &path_file, const std::string &out_file)
       build_traj_service_(n_.advertiseService("/fc/path/build", &PathGen::onBuild, this)),
       speed_(0.0),
       current_time_(0.0),
-      hz_(10),
+      hz_(20),
       first_play_(false),
       path_loaded_(false),
       current_pose_(Eigen::Vector4d(0.0, 0.0, 0.0, 0.0)),
@@ -23,10 +23,12 @@ PathGen::PathGen(const std::string &path_file, const std::string &out_file)
     return;
   }
 
+  ROS_INFO("Running at %0.1f Hz", hz_);
+
   while (ros::ok()) {
     advanceTime(speed_);
     publishPose();
-    if(cnt_ % 10 == 0) {
+    if(cnt_ % 20 == 0) {
       publishStatus();
       cnt_ = 1;
     }
